@@ -8,21 +8,25 @@
 {% endblock sidenav %}
 
 {% block content %}
-    <h1>User Login</h1>
-    <form action="{% url 'login' %}" method="post">
-        <table>
-            {{ form.as_table }}
-            <tr>
-                <td>
-                    <input type="submit" value="Login">
-                </td>
-            </tr>
-        </table>
-        <p>
-            To register <a href="{% url 'register' %}">click here</a>.
-        </p>
+    <section style="max-width: 400px; margin: 3rem auto; padding: 2rem; background: var(--bg-secondary); border-radius: 12px; box-shadow: var(--shadow);">
+        <h1 style="margin-bottom: 1.5rem; color: var(--primary); font-weight: 700;">User Login</h1>
 
-        <input type="hidden" name="next" value="{{ next }}" />
-        {% csrf_token %}
-    </form>
+        <form action="{% url 'login' %}" method="post" novalidate>
+            {% csrf_token %}
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0 1rem;">
+                {{ form.as_table }}
+                <tr>
+                    <td colspan="2" style="text-align: center; padding-top: 0.5rem;">
+                        <input type="submit" value="Login"
+                          style="background: var(--primary); color: white; padding: 10px 25px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: background 0.3s;">
+                    </td>
+                </tr>
+            </table>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                To register <a href="{% url 'register' %}" style="color: var(--primary); text-decoration: underline;">click here</a>.
+            </p>
+
+            <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+    </section>
 {% endblock content %}

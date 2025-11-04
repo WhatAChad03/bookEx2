@@ -1,10 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>Rate Book: {{ book.name }}</h2>
-  <form method="post">
-    {% csrf_token %}
-    <label for="rating">Rate (1-5):</label>
-    <input type="number" id="rating" name="rating" min="1" max="5" required>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
-{% endblock content %}
+  <div style="max-width: 400px; margin: 3rem auto; padding: 2rem; background: var(--bg-secondary); border-radius: 14px; box-shadow: var(--shadow);">
+    <h2 style="color: var(--primary); margin-bottom: 1.5rem;">Rate Book: {{ book.name }}</h2>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <label for="rating" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Rate (1-5):</label>
+      <input type="number" id="rating" name="rating" min="1" max="5" required
+             style="width: 100%; padding: 10px 12px; font-size: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
+      <button type="submit" style="width: 100%; padding: 12px 0; background: var(--primary); color: white; font-weight: 700; font-size: 1.1rem; border: none; border-radius: 10px; cursor: pointer; transition: background 0.3s;">
+        Submit
+      </button>
+    </form>
+  </div>
+{% endblock %}

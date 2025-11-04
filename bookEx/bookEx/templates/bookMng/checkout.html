@@ -6,26 +6,32 @@
 {% endblock sidenav %}
 
 {% block content %}
-  <h2>Checkout Confirmation</h2>
+  <div style="max-width: 700px; margin: 2rem auto; padding: 2rem; background: var(--bg-secondary); border-radius: 16px; box-shadow: var(--shadow);">
+    <h2 style="font-weight: 700; color: var(--primary); margin-bottom: 1.5rem;">Checkout Confirmation</h2>
 
-  {% if cart_items %}
-    <p>Are you sure you want to checkout the following items?</p>
+    {% if cart_items %}
+      <p style="font-size: 1.1rem; margin-bottom: 1rem;">Are you sure you want to checkout the following items?</p>
 
-    <ul class="list-group mb-3">
-      {% for item in cart_items %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          {{ item.book.name }} (Quantity: {{ item.quantity }})
-          <span class="badge bg-secondary rounded-pill">${{ item.book.price }}</span>
-        </li>
-      {% endfor %}
-    </ul>
+      <ul class="list-group mb-3" style="list-style: none; padding-left: 0;">
+        {% for item in cart_items %}
+          <li class="list-group-item d-flex justify-content-between align-items-center" style="background: var(--bg-primary); border-radius: 10px; padding: 12px 20px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+            <span>{{ item.book.name }} (Quantity: {{ item.quantity }})</span>
+            <span class="badge rounded-pill" style="background: var(--primary); color: white; padding: 6px 14px; font-weight: 600;">${{ item.book.price }}</span>
+          </li>
+        {% endfor %}
+      </ul>
 
-    <form method="post">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-success">Confirm Checkout</button>
-      <a href="{% url 'cart' %}" class="btn btn-secondary">Cancel</a>
-    </form>
-  {% else %}
-    <p>Your cart is empty.</p>
-  {% endif %}
+      <form method="post" style="display: flex; gap: 16px; justify-content: center; margin-top: 2rem;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success" style="padding: 12px 28px; font-weight: 700; font-size: 1rem; border-radius: 10px; box-shadow: 0 5px 12px rgba(40,167,69,0.6); cursor: pointer;">
+          Confirm Checkout
+        </button>
+        <a href="{% url 'cart' %}" class="btn btn-secondary" style="padding: 12px 28px; font-weight: 700; font-size: 1rem; border-radius: 10px; box-shadow: 0 5px 12px rgba(108,117,125,0.6); cursor: pointer; text-decoration:none; color: white; background: var(--text-secondary);">
+          Cancel
+        </a>
+      </form>
+    {% else %}
+      <p style="font-style: italic; color: var(--text-secondary); font-size: 1.1rem;">Your cart is empty.</p>
+    {% endif %}
+  </div>
 {% endblock content %}

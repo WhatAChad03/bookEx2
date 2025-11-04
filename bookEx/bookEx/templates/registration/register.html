@@ -8,14 +8,22 @@
 {% endblock sidenav %}
 
 {% block content %}
-   <h1>User Registration</h1>
-   <form action="" method="post">
-       {% csrf_token %}
-       {{ form.non_field_errors }}
-       <table>
-           {{ form.as_table }}
-       </table>
-       <input type="hidden" name="next" value="{{ next }}" />
-       <input type="submit" value="Submit">
-   </form>
+   <section style="max-width: 400px; margin: 3rem auto; padding: 2rem; background: var(--bg-secondary); border-radius: 12px; box-shadow: var(--shadow);">
+      <h1 style="font-weight: 700; color: var(--primary); margin-bottom: 1.5rem;">User Registration</h1>
+      <form action="" method="post" novalidate>
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+
+          <table style="width: 100%; border-collapse: separate; border-spacing: 0 1rem;">
+              {{ form.as_table }}
+          </table>
+
+          <input type="hidden" name="next" value="{{ next }}" />
+
+          <div style="text-align: center; margin-top: 1.5rem;">
+              <input type="submit" value="Submit"
+                     style="background: var(--primary); color: white; padding: 10px 28px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; font-size: 1.1rem; transition: background 0.3s ease;">
+          </div>
+      </form>
+   </section>
 {% endblock content %}

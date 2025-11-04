@@ -1,29 +1,35 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block sidenav %}
-   {% for item in item_list %}
-      <li>
-        <a href="{{ item.link }}">  {{ item.item }} </a>
-      </li>
-   {% endfor %}
-{% endblock sidenav %}
+{% block title %}Post a Book{% endblock %}
 
 {% block content %}
-  <h1>Post Book</h1>
+<div style="max-width: 600px; margin: 3rem auto; background: var(--bg-secondary); padding: 2.5rem 3rem; border-radius: 16px; box-shadow: var(--shadow);">
+  <h1 style="color: var(--primary); font-weight: 800; margin-bottom: 1.8rem;">Post a New Book</h1>
+
   {% if submitted %}
-      <h1> Post Book Successfully! </h1>
+  <div style="padding: 1.4rem; background-color: #34a853; color: white; border-radius: 8px; text-align: center; font-weight: 700; font-size: 1.3rem;">
+    Book posted successfully!
+  </div>
   {% else %}
-    <form action="" enctype="multipart/form-data" method="post" novalidate>
-      <table>
-         {{ form.as_table }}
-          <tr>
-             <td>
-                 <input type="submit" value="Submit">
-             </td>
-          </tr>
-      </table>
-      {% csrf_token %}
-     </form>
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div style="margin-bottom: 1.5rem;">
+        <label for="{{ field.id_for_label }}" style="display: block; color: var(--text-primary); font-weight: 600; margin-bottom: 0.4rem;">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+          <small style="color: var(--text-secondary); display: block; margin-top: 0.3rem;">{{ field.help_text }}</small>
+        {% endif %}
+        {% for error in field.errors %}
+          <span style="color: red; font-size: 0.9rem;">{{ error }}</span>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    <button type="submit" style="width: 100%; padding: 14px 0; font-weight: 700; font-size: 1.1rem; background: var(--primary); color: white; border: none; border-radius: 12px; box-shadow: 0 4px 10px var(--primary-dark); cursor: pointer; transition: background 0.3s ease;">
+      Submit Book
+    </button>
+  </form>
   {% endif %}
-{% endblock content %}
+</div>
+{% endblock %}

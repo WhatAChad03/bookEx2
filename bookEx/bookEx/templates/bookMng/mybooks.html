@@ -1,47 +1,43 @@
 {% extends 'base.html' %}
-{% block sidenav %}
-  {% for item in item_list %}
-    <li><a href="{{ item.link }}">{{ item.item }}</a></li>
-  {% endfor %}
-{% endblock sidenav %}
-
 {% block content %}
-<h2>Books You Posted</h2>
-{% if posted_books %}
-  <ul class="list-group mb-4">
-    {% for book in posted_books %}
-      <li class="list-group-item">
-        <a href="{% url 'book_detail' book.id %}">{{ book.name }}</a>
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>You haven't posted any books yet.</p>
-{% endif %}
+  <section class="user-books-section" style="max-width: 900px; margin: 0 auto; padding: 20px;">
+    <h2 style="font-weight: 700; font-size: 2rem; color: var(--primary); margin-bottom: 20px;">Books You Posted</h2>
+    {% if posted_books %}
+      <ul class="list-group mb-5" style="list-style: none; padding-left: 0;">
+        {% for book in posted_books %}
+          <li class="book-item" style="background: var(--bg-secondary); border-radius: 8px; padding: 15px 20px; margin-bottom: 10px; box-shadow: var(--shadow);">
+            <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: var(--primary); font-weight: 600; font-size: 1.1rem;">{{ book.name }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p style="font-style: italic; color: var(--text-secondary);">You haven't posted any books yet.</p>
+    {% endif %}
 
-<h2>Books You Purchased</h2>
-{% if purchased_books %}
-  <ul class="list-group mb-4">
-    {% for book in purchased_books %}
-      <li class="list-group-item">
-        <a href="{% url 'book_detail' book.id %}">{{ book.name }}</a>
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>You haven't purchased any books yet.</p>
-{% endif %}
+    <h2 style="font-weight: 700; font-size: 2rem; color: var(--primary); margin-bottom: 20px;">Books You Purchased</h2>
+    {% if purchased_books %}
+      <ul class="list-group mb-5" style="list-style: none; padding-left: 0;">
+        {% for book in purchased_books %}
+          <li class="book-item" style="background: var(--bg-secondary); border-radius: 8px; padding: 15px 20px; margin-bottom: 10px; box-shadow: var(--shadow);">
+            <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: var(--primary); font-weight: 600; font-size: 1.1rem;">{{ book.name }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p style="font-style: italic; color: var(--text-secondary);">You haven't purchased any books yet.</p>
+    {% endif %}
 
-<h2>Your Favorite Books</h2>
-{% if favorite_books %}
-  <ul class="list-group">
-    {% for book in favorite_books %}
-      <li class="list-group-item">
-        <a href="{% url 'book_detail' book.id %}">{{ book.name }}</a>
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>You have no favorite books yet.</p>
-{% endif %}
+    <h2 style="font-weight: 700; font-size: 2rem; color: var(--primary); margin-bottom: 20px;">Your Favorite Books</h2>
+    {% if favorite_books %}
+      <ul class="list-group" style="list-style: none; padding-left: 0;">
+        {% for book in favorite_books %}
+          <li class="book-item" style="background: var(--bg-secondary); border-radius: 8px; padding: 15px 20px; margin-bottom: 10px; box-shadow: var(--shadow);">
+            <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: var(--primary); font-weight: 600; font-size: 1.1rem;">{{ book.name }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p style="font-style: italic; color: var(--text-secondary);">You have no favorite books yet.</p>
+    {% endif %}
+  </section>
 {% endblock content %}

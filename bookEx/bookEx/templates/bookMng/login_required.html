@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block sidenav %}
   {% for item in item_list %}
@@ -7,8 +7,8 @@
 {% endblock sidenav %}
 
 {% block content %}
-  <div class="alert alert-warning mt-4" role="alert">
-    <h4 class="alert-heading">Attention</h4>
-    <p>{{ message }}</p>
+  <div class="alert alert-warning mt-4" role="alert" style="max-width: 700px; margin: 2rem auto; padding: 1.3rem 2rem; border-radius: 12px; box-shadow: var(--shadow); font-size: 1.1rem; color: #856404; background-color: #fff3cd; border-color: #ffeeba;">
+    <h4 class="alert-heading" style="font-weight: 700; margin-bottom: 0.75rem;">Attention</h4>
+    <p style="margin-bottom: 0;">{{ message }}</p>
   </div>
 {% endblock content %}
