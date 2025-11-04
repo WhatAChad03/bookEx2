@@ -13,11 +13,19 @@
     </div>
 
     <div style="flex: 1; min-width: 300px; color: var(--text-primary); font-size: 16px;">
-
       <p><strong>Price:</strong> ${{ book.price }}</p>
       <p><strong>Posted by:</strong> {{ book.username }}</p>
       <p><strong>Date:</strong> {{ book.publishdate }}</p>
       <p><strong>Website:</strong> <a href="{{ book.web }}" target="_blank" style="color: var(--primary); text-decoration: underline;">{{ book.web }}</a></p>
+
+      <!-- Add to Cart button -->
+      {% if user.is_authenticated %}
+      <a href="{% url 'add_to_cart' book.id %}" class="btn btn-primary" style="padding: 12px 22px; font-weight: 700; margin-top: 20px; display: inline-block;">
+        Add to Cart
+      </a>
+      {% else %}
+      <p><a href="{% url 'login' %}">Login</a> to purchase this book.</p>
+      {% endif %}
 
       <div style="margin-top: 20px;">
         <a href="{% url 'rate_book' book.id %}" class="btn btn-warning" style="padding: 12px 22px; font-weight: 700;">Rate this Book</a>
@@ -34,11 +42,41 @@
 
       <h3 style="margin-top: 40px; color: var(--primary);">Ratings</h3>
       {% if ratings %}
-        <p><strong>Average Rating:</strong> {{ avg_rating|default:"No ratings yet" }}</p>
+        <p><strong>Average Rating:</strong>
+          {% if avg_rating %}
+            <span>
+              {% for i in "12345" %}
+                {% if avg_rating|floatformat:1 >= i %}
+                  <span style="color:#FFD700; font-size:1.5rem;">&#9733;</span>
+                {% elif avg_rating|floatformat:1 > i|add:"-1" %}
+                  <span style="position: relative; font-size:1.5rem;">
+                    <span style="color:#FFD700; position:absolute; overflow:hidden; width:50%;">&#9733;</span>
+                    <span style="color:#ccc;">&#9733;</span>
+                  </span>
+                {% else %}
+                  <span style="color:#ccc; font-size:1.5rem;">&#9733;</span>
+                {% endif %}
+              {% endfor %}
+            </span>
+            ({{ avg_rating }}/5)
+          {% else %}
+            No ratings yet
+          {% endif %}
+        </p>
+
         <ul style="list-style:none; padding-left:0;">
           {% for rate in ratings %}
           <li style="margin-bottom: 8px; padding: 8px; background: var(--bg-secondary); border-radius: 6px;">
-            <strong>{% if rate.user == user %}You{% else %}Anonymous{% endif %}</strong> : {{ rate.rating }} / 5
+            <strong>{% if rate.user == user %}You{% else %}Anonymous{% endif %}</strong> :
+            <span>
+              {% for i in "12345" %}
+                {% if i|add:"0" <= rate.rating %}
+                  <span style="color:#FFD700; font-size:1.3rem;">&#9733;</span>
+                {% else %}
+                  <span style="color:#ccc; font-size:1.3rem;">&#9733;</span>
+                {% endif %}
+              {% endfor %}
+            </span>
           </li>
           {% endfor %}
         </ul>
@@ -77,7 +115,6 @@
         <p>No comments yet. Be the first to add one!</p>
       {% endif %}
     </div>
-
   </div>
 </div>
-{% endblock content %}
+{% endblock %}

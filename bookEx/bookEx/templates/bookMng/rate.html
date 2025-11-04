@@ -1,16 +1,45 @@
 {% extends 'base.html' %}
 {% block content %}
-  <div style="max-width: 400px; margin: 3rem auto; padding: 2rem; background: var(--bg-secondary); border-radius: 14px; box-shadow: var(--shadow);">
-    <h2 style="color: var(--primary); margin-bottom: 1.5rem;">Rate Book: {{ book.name }}</h2>
+<div style="max-width: 400px; margin: 3rem auto; padding: 2rem; background: var(--bg-secondary); border-radius: 14px; box-shadow: var(--shadow);">
+  <h2 style="color: var(--primary); margin-bottom: 1.5rem;">Rate Book: {{ book.name }}</h2>
 
-    <form method="post" novalidate>
-      {% csrf_token %}
-      <label for="rating" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Rate (1-5):</label>
-      <input type="number" id="rating" name="rating" min="1" max="5" required
-             style="width: 100%; padding: 10px 12px; font-size: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
-      <button type="submit" style="width: 100%; padding: 12px 0; background: var(--primary); color: white; font-weight: 700; font-size: 1.1rem; border: none; border-radius: 10px; cursor: pointer; transition: background 0.3s;">
-        Submit
-      </button>
-    </form>
-  </div>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Your Rating:</label>
+
+    <div class="star-rating" style="display: flex; gap: 6px; margin-bottom: 1rem; cursor: pointer;">
+      {% for i in "12345" %}
+      <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" required style="display:none;">
+      <label for="star{{ i }}" style="font-size: 2rem; color: #ccc; transition: color 0.2s;">&#9733;</label>
+      {% endfor %}
+    </div>
+
+    <button type="submit" style="width: 100%; padding: 12px 0; background: var(--primary); color: white; font-weight: 700; font-size: 1.1rem; border: none; border-radius: 10px; cursor: pointer;">
+      Submit
+    </button>
+  </form>
+</div>
+
+<script>
+  const labels = document.querySelectorAll('.star-rating label');
+  const inputs = document.querySelectorAll('.star-rating input');
+
+  labels.forEach((label, idx) => {
+    label.addEventListener('mouseover', () => {
+      labels.forEach((l, j) => l.style.color = j <= idx ? '#FFD700' : '#ccc');
+    });
+    label.addEventListener('mouseout', () => {
+      const checked = document.querySelector('.star-rating input:checked');
+      if (checked) {
+        labels.forEach((l, j) => l.style.color = j < checked.value ? '#FFD700' : '#ccc');
+      } else {
+        labels.forEach(l => l.style.color = '#ccc');
+      }
+    });
+    label.addEventListener('click', () => {
+      inputs[idx].checked = true;
+      labels.forEach((l, j) => l.style.color = j < inputs[idx].value ? '#FFD700' : '#ccc');
+    });
+  });
+</script>
 {% endblock %}

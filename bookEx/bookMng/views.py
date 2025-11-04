@@ -11,6 +11,7 @@ from django.urls import reverse_lazy
 from .models import ShoppingCart
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg
+from django.db.models import Sum
 
 def index(request):
    return render(request, 'bookMng/index.html', { 'item_list': MainMenu.objects.all() })
@@ -34,63 +35,56 @@ def postbook(request):
    return render(request, 'bookMng/postbook.html', { 'form': form, 'item_list': MainMenu.objects.all(), 'submitted': submitted })
 
 def displaybooks(request):
-   books = Book.objects.all()
-   for b in books:
-       b.pic_path = b.picture.url[14:]
-   return render(request, 'bookMng/displaybooks.html', { 'item_list': MainMenu.objects.all(), 'books': books })
+    books = Book.objects.all()
+    for b in books:
+        b.pic_path = b.picture.url.split('/static/')[-1]
+    return render(request, 'bookMng/displaybooks.html', {'item_list': MainMenu.objects.all(), 'books': books})
 
 
 def book_detail(request, book_id):
-    book = Book.objects.get(id=book_id)
-    book.pic_path = book.picture.url[14:]
+    book = get_object_or_404(Book, id=book_id)
+    book.pic_path = book.picture.url.split('/static/')[-1]
 
-    # Get all ratings for the book
     ratings = Rate.objects.filter(book=book)
-
-    # Average rating for display if desired
     avg_rating = ratings.aggregate(Avg('rating'))['rating__avg']
-
-    # User's own rating if exists
-    user_rating = None
-    if request.user.is_authenticated:
-        try:
-            user_rating = ratings.get(user=request.user).rating
-        except Rate.DoesNotExist:
-            user_rating = None
 
     return render(request, 'bookMng/book_detail.html', {
         'item_list': MainMenu.objects.all(),
         'book': book,
         'ratings': ratings,
-        'avg_rating': avg_rating,
-        'user_rating': user_rating,
+        'avg_rating': avg_rating
     })
-
 
 
 def mybooks(request):
     if not request.user.is_authenticated:
+        # Your existing login required logic
         return render(request, 'bookMng/login_required.html', {
             'message': 'You need to login to view your books.',
             'item_list': MainMenu.objects.all(),
         })
+
     posted_books = Book.objects.filter(username=request.user)
-    purchased_cart_items = ShoppingCart.objects.filter(user=request.user, checked_out=True)
-    purchased_books = Book.objects.filter(id__in=purchased_cart_items.values_list('book_id', flat=True))
+    purchased_items = ShoppingCart.objects.filter(user=request.user, checked_out=True)
+    purchased_books_quantities = purchased_items.values('book').annotate(total_quantity=Sum('quantity'))
+    purchased_books = Book.objects.filter(id__in=purchased_items.values_list('book_id', flat=True))
     favorite_books = request.user.favorite_books.all()
 
     for book in posted_books:
-        book.pic_path = book.picture.url[14:]
+        book.pic_path = book.picture.url.split('/static/')[-1]
     for book in purchased_books:
-        book.pic_path = book.picture.url[14:]
+        book.pic_path = book.picture.url.split('/static/')[-1]
     for book in favorite_books:
-        book.pic_path = book.picture.url[14:]
+        book.pic_path = book.picture.url.split('/static/')[-1]
+
+    purchased_quantities = {pq['book']: pq['total_quantity'] for pq in purchased_books_quantities}
 
     return render(request, 'bookMng/mybooks.html', {
         'item_list': MainMenu.objects.all(),
         'posted_books': posted_books,
         'purchased_books': purchased_books,
-        'favorite_books': favorite_books,
+        'purchased_quantities': purchased_quantities,
+        'favorite_books': favorite_books
     })
 
 def book_delete(request, book_id):
@@ -121,39 +115,38 @@ def searchbooks(request):
     books = Book.objects.filter(name__icontains=query) if query else []
     return render(request, 'searchbooks.html', { 'books': books, 'item_list': MainMenu.objects.all(), 'query': query })
 
+@login_required
 def add_to_cart(request, book_id):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    book = Book.objects.get(id=book_id)
-    cart, created = ShoppingCart.objects.get_or_create(user=request.user, book=book)
+    book = get_object_or_404(Book, id=book_id)
+    cart_item, created = ShoppingCart.objects.get_or_create(user=request.user, book=book, checked_out=False)
     if not created:
-        cart.quantity += 1
-        cart.save()
-    return redirect('displaybooks')
+        cart_item.quantity += 1
+    cart_item.save()
+    return redirect('checkout')
 
 @login_required
 def view_cart(request):
-    cart_items = ShoppingCart.objects.filter(user=request.user)
-    return render(request, 'bookMng/cart.html', {
-        'item_list': MainMenu.objects.all(),
-        'cart_items': cart_items,
-    })
+    cart_items = ShoppingCart.objects.filter(user=request.user, checked_out=False).select_related('book')
+    for item in cart_items:
+        item.book.pic_path = item.book.picture.url.split('/static/')[-1]
+    return render(request, 'bookMng/cart.html', {'item_list': MainMenu.objects.all(), 'cart_items': cart_items})
 
+@login_required
 def checkout(request):
-    if not request.user.is_authenticated:
-        return render(request, 'bookMng/login_required.html', {
-            'message': 'You need to login to checkout.',
-            'item_list': MainMenu.objects.all(),
-        })
     if request.method == 'POST':
         ShoppingCart.objects.filter(user=request.user, checked_out=False).update(checked_out=True)
         return redirect('mybooks')
     else:
         cart_items = ShoppingCart.objects.filter(user=request.user, checked_out=False).select_related('book')
+        total_price = sum(item.quantity * item.book.price for item in cart_items)
+        for item in cart_items:
+            item.book.pic_path = item.book.picture.url.split('/static/')[-1]
         return render(request, 'bookMng/checkout.html', {
             'item_list': MainMenu.objects.all(),
-            'cart_items': cart_items
+            'cart_items': cart_items,
+            'total_price': total_price
         })
+
 
 @login_required
 def rate_book(request, book_id):
@@ -207,3 +200,18 @@ def delete_comment(request, comment_id):
     book_id = comment.book.id
     comment.delete()
     return redirect('book_detail', book_id=book_id)
+
+@login_required
+def update_cart_quantity(request, book_id):
+    if request.method == 'POST':
+        book = get_object_or_404(Book, id=book_id)
+        cart_item = ShoppingCart.objects.filter(user=request.user, book=book, checked_out=False).first()
+        if cart_item:
+            try:
+                qty = int(request.POST.get('quantity', 1))
+                if qty > 0:
+                    cart_item.quantity = qty
+                    cart_item.save()
+            except ValueError:
+                pass
+        return redirect('checkout')

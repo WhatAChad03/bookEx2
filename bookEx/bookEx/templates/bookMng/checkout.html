@@ -1,37 +1,69 @@
 {% extends 'base.html' %}
-{% block sidenav %}
-  {% for item in item_list %}
-    <li><a href="{{ item.link }}">{{ item.item }}</a></li>
-  {% endfor %}
-{% endblock sidenav %}
-
+{% load static %}
+{% load static custom_filters %}
 {% block content %}
-  <div style="max-width: 700px; margin: 2rem auto; padding: 2rem; background: var(--bg-secondary); border-radius: 16px; box-shadow: var(--shadow);">
-    <h2 style="font-weight: 700; color: var(--primary); margin-bottom: 1.5rem;">Checkout Confirmation</h2>
-
-    {% if cart_items %}
-      <p style="font-size: 1.1rem; margin-bottom: 1rem;">Are you sure you want to checkout the following items?</p>
-
-      <ul class="list-group mb-3" style="list-style: none; padding-left: 0;">
+<div style="max-width: 800px; margin: 2rem auto; background: var(--bg-secondary); border-radius: 12px; padding: 2rem; box-shadow: var(--shadow);">
+  <h2 style="font-weight: 700; color: var(--primary); margin-bottom: 1.5rem;">Checkout</h2>
+  {% if cart_items %}
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background: var(--primary); color: white;">
+          <th>Image</th>
+          <th>Title</th>
+          <th>Rating</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
         {% for item in cart_items %}
-          <li class="list-group-item d-flex justify-content-between align-items-center" style="background: var(--bg-primary); border-radius: 10px; padding: 12px 20px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-            <span>{{ item.book.name }} (Quantity: {{ item.quantity }})</span>
-            <span class="badge rounded-pill" style="background: var(--primary); color: white; padding: 6px 14px; font-weight: 600;">${{ item.book.price }}</span>
-          </li>
+        <tr style="background: var(--bg-primary); text-align: center;">
+          <td>
+            <img src="{% static item.book.pic_path %}" alt="{{ item.book.name }}" style="width: 70px; height: 100px; object-fit: cover; border-radius: 6px;">
+          </td>
+          <td style="font-weight: 600;">
+            <a href="{% url 'book_detail' item.book.id %}" style="color: var(--primary); text-decoration: none;">
+              {{ item.book.name }}
+            </a>
+          </td>
+          <td>
+            {% for i in "12345" %}
+              {% if i|add:'0' <= item.book.average_rating %}
+                <span style="color:#FFD700;">★</span>
+              {% else %}
+                <span style="color:#ccc;">★</span>
+              {% endif %}
+            {% endfor %}
+            <br>({{ item.book.average_rating|floatformat:1 }}/5)
+          </td>
+          <td>
+            <form method="post" action="{% url 'update_cart_quantity' item.book.id %}">
+              {% csrf_token %}
+              <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width: 50px;">
+              <button type="submit">Update</button>
+            </form>
+          </td>
+          <td>${{ item.book.price }}</td>
+          <td>${{ item.quantity|floatformat:2|floatformat }} * {{ item.book.price|floatformat:2 }} = {{ item.quantity|mul:item.book.price|floatformat:2 }}</td>
+        </tr>
         {% endfor %}
-      </ul>
+      </tbody>
+    </table>
 
-      <form method="post" style="display: flex; gap: 16px; justify-content: center; margin-top: 2rem;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-success" style="padding: 12px 28px; font-weight: 700; font-size: 1rem; border-radius: 10px; box-shadow: 0 5px 12px rgba(40,167,69,0.6); cursor: pointer;">
-          Confirm Checkout
-        </button>
-        <a href="{% url 'cart' %}" class="btn btn-secondary" style="padding: 12px 28px; font-weight: 700; font-size: 1rem; border-radius: 10px; box-shadow: 0 5px 12px rgba(108,117,125,0.6); cursor: pointer; text-decoration:none; color: white; background: var(--text-secondary);">
-          Cancel
-        </a>
-      </form>
-    {% else %}
-      <p style="font-style: italic; color: var(--text-secondary); font-size: 1.1rem;">Your cart is empty.</p>
-    {% endif %}
-  </div>
-{% endblock content %}
+    <hr style="margin: 1.5rem 0; border: 1px solid var(--border);">
+
+    <p style="font-weight: 700; font-size: 1.2rem; text-align: right;">
+      Total: ${{ total_price|floatformat:2 }}
+    </p>
+
+    <form method="post" style="margin-top: 16px;" action="{% url 'checkout' %}">
+      {% csrf_token %}
+      <button type="submit" style="padding: 12px 24px; font-weight: 700; font-size: 1rem; border: none; border-radius: 8px; background: var(--primary); color: white;">Confirm Purchase</button>
+      <a href="{% url 'cart' %}" style="padding: 12px 24px; margin-left: 10px; font-weight: 700; border-radius: 8px; background: var(--text-secondary); color: white; text-decoration: none;">Cancel</a>
+    </form>
+  {% else %}
+  <p style="font-style: italic; color: var(--text-secondary); font-size: 1.1rem;">Your cart is empty.</p>
+  {% endif %}
+</div>
+{% endblock %}

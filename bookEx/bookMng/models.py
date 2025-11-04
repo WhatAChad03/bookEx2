@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.timezone import now
+from django.db.models import Avg
 
 class MainMenu(models.Model):
    item = models.CharField(max_length=300, unique=True)
@@ -10,20 +11,29 @@ class MainMenu(models.Model):
        return self.item
 
 class Book(models.Model):
-   name = models.CharField(max_length=200)
-   web = models.URLField(max_length=300)
-   price = models.DecimalField(decimal_places=2, max_digits=8)
-   publishdate = models.DateField(auto_now=True)
-   picture = models.FileField(upload_to='bookEx/static/uploads')
-   pic_path = models.CharField(max_length=300, editable=False, blank=True)
-   username = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
-   favorites = models.ManyToManyField(User, related_name='favorite_books', blank=True)
+    name = models.CharField(max_length=200)
+    web = models.URLField(max_length=300)
+    price = models.DecimalField(decimal_places=2, max_digits=8)
+    publishdate = models.DateField(auto_now=True)
+    picture = models.FileField(upload_to='bookEx/static/uploads')
+    pic_path = models.CharField(max_length=300, editable=False, blank=True)
+    username = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+    favorites = models.ManyToManyField(User, related_name='favorite_books', blank=True)
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def average_rating(self):
+        avg = self.rate_set.aggregate(models.Avg('rating'))['rating__avg']
+        return avg or 0
+
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    checked_out = models.BooleanField(default=False)  # New field to mark purchase status
+    checked_out = models.BooleanField(default=False)  # marks if purchased
 
     def __str__(self):
         return f"{self.quantity} x {self.book.name} for {self.user.username}"
