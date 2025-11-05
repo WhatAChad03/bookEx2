@@ -19,6 +19,8 @@ from .forms import CustomUserCreationForm
 from .models import UserProfile
 from django.contrib.auth import login
 from django.contrib.auth.models import Group
+from django.shortcuts import get_object_or_404, redirect
+
 
 def index(request):
    return render(request, 'bookMng/index.html', { 'item_list': MainMenu.objects.all() })
@@ -406,3 +408,10 @@ def delete_book(request, book_id):
         book.delete()
         return redirect('mybooks')
     return render(request, 'delete_confirm.html', {'book': book})
+
+@login_required
+def cancel_checkout(request):
+    if request.method == 'POST':
+        # Remove all shopping cart items for the current user that are not checked out
+        ShoppingCart.objects.filter(user=request.user, checked_out=False).delete()
+    return redirect('cart')  # Ensure 'cart' URL name exists

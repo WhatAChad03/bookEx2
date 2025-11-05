@@ -1,37 +1,46 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Home - Book Exchange{% endblock %}
 
 {% block content %}
 <div style="padding-top: 6rem; text-align: center; max-width: 900px; margin: 0 auto 3rem auto;">
-    <h1 style="font-size: 6rem; font-weight: 400; line-height: 1; color: var(--text-primary); margin-bottom: 1.2rem; user-select:none;">
-        Book Exchange
-    </h1>
+  <h1 style="font-size: 6rem; font-weight: 400; line-height: 1; color: var(--text-primary); margin-bottom: 1.2rem; user-select:none;">
+    Book Exchange
+  </h1>
 
-    <form method="get" action="{% url 'searchbooks' %}" style="max-width: 640px; margin: 0 auto;">
-        <div style="position: relative; display: flex; align-items: center; padding: 0 1rem;">
-            <i class="fas fa-search" style="color: var(--border); position: absolute; left: 1rem; font-size: 1.4rem;"></i>
-            <input type="text" name="q" placeholder="Search for books..."
-                   value="{{ request.GET.q|default:'' }}" aria-label="Search books"
-                   style="width: 100%; padding: 1rem 1rem 1rem 3rem; font-size: 1.25rem; color: var(--text-primary);
-                          border-radius: 30px; border: 2px solid var(--border); transition: border-color 0.3s ease;"
-                   onfocus="this.style.borderColor='var(--primary)';"
-                   onblur="this.style.borderColor='var(--border)';" />
-            <button type="submit" style="background: var(--primary); border: none; padding: 1rem 2rem; margin-left: 1rem; border-radius: 30px; color: white; font-size: 1.25rem; font-weight: 700; cursor: pointer; user-select:none; box-shadow: 0 6px 12px rgba(26, 115, 232, 0.4); transition: background 0.3s ease;">
-                Book Search
-            </button>
-        </div>
-    </form>
-
-    <div style="display: flex; flex-wrap: wrap; gap: 1.25rem; justify-content: center; margin-top: 2rem;">
-        {% for action in actions %}
-        <a href="{% url action.url %}" style="background: var(--bg-secondary); border-radius: 16px; padding: 1.5rem 2rem; width: 140px; text-decoration: none; color: var(--text-primary); box-shadow: 0 6px 18px rgba(59, 130, 246, 0.16); transition: background-color 0.25s, box-shadow 0.25s; display: flex; flex-direction: column; align-items: center; user-select:none;"
-           onmouseover="this.style.backgroundColor='var(--primary)'; this.style.color='white'; this.style.boxShadow='0 10px 26px rgba(26, 115, 232, 0.6)';"
-           onmouseout="this.style.backgroundColor='var(--bg-secondary)'; this.style.color='var(--text-primary)'; this.style.boxShadow='0 6px 18px rgba(59, 130, 246, 0.16)';">
-           <i class="fas fa-{{ action.icon }}" style="font-size: 2.4rem; margin-bottom: 0.75rem;"></i>
-           <span style="font-size: 0.9rem; color: var(--text-secondary);">{{ action.label }}</span>
-        </a>
-        {% endfor %}
+  <form method="get" action="{% url 'searchbooks' %}" style="max-width: 640px; margin: 0 auto;">
+    <div style="position: relative; display: flex; align-items: center; padding: 0 1rem;">
+      <i class="fas fa-search" style="color: var(--border); position: absolute; left: 1rem; font-size: 1.4rem;"></i>
+      <input type="text" name="q" placeholder="Search for books..."
+             value="{{ request.GET.q|default:'' }}" aria-label="Search books"
+             style="width: 100%; padding: 1rem 1rem 1rem 3rem; font-size: 1.25rem; color: var(--text-primary);
+                    border-radius: 30px; border: 2px solid var(--border); transition: border-color 0.3s ease;"
+             onfocus="this.style.borderColor='var(--primary)';"
+             onblur="this.style.borderColor='var(--border)';" />
+      <button type="submit" style="background: var(--primary); border: none; padding: 1rem 2rem; margin-left: 1rem; border-radius: 30px; color: white; font-size: 1.25rem; font-weight: 700; cursor: pointer; user-select:none; box-shadow: 0 6px 12px rgba(26, 115, 232, 0.4); transition: background 0.3s ease;">
+        Book Search
+      </button>
     </div>
+  </form>
+
+  <!-- Video below search bar -->
+  <div style="margin-top: 2rem;">
+      <video controls width="100%" style="max-width: 400px; border-radius: 12px; box-shadow: var(--shadow); margin: 2rem auto 0;">
+          <source src="{% static 'uploads/BookExchange.mp4' %}" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 1.25rem; justify-content: center; margin-top: 2rem;">
+    {% for action in actions %}
+    <a href="{% url action.url %}" style="background: var(--bg-secondary); border-radius: 16px; padding: 1.5rem 2rem; width: 140px; text-decoration: none; color: var(--text-primary); box-shadow: 0 6px 18px rgba(59, 130, 246, 0.16); transition: background-color 0.25s, box-shadow 0.25s; display: flex; flex-direction: column; align-items: center; user-select:none;"
+       onmouseover="this.style.backgroundColor='var(--primary)'; this.style.color='white'; this.style.boxShadow='0 10px 26px rgba(26, 115, 232, 0.6)';"
+       onmouseout="this.style.backgroundColor='var(--bg-secondary)'; this.style.color='var(--text-primary)'; this.style.boxShadow='0 6px 18px rgba(59, 130, 246, 0.16)';">
+      <i class="fas fa-{{ action.icon }}" style="font-size: 2.4rem; margin-bottom: 0.75rem;"></i>
+      <span style="font-size: 0.9rem; color: var(--text-secondary);">{{ action.label }}</span>
+    </a>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

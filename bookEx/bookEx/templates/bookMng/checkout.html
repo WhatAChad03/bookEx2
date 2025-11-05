@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load static custom_filters %}
+{% load custom_filters %}
+
 {% block content %}
 <div style="max-width: 800px; margin: 2rem auto; background: var(--bg-secondary); border-radius: 12px; padding: 2rem; box-shadow: var(--shadow);">
   <h2 style="font-weight: 700; color: var(--primary); margin-bottom: 1.5rem;">Checkout</h2>
+
   {% if cart_items %}
     <table style="width: 100%; border-collapse: collapse;">
       <thead>
@@ -45,7 +47,7 @@
             </form>
           </td>
           <td>${{ item.book.price }}</td>
-          <td>${{ item.quantity|floatformat:2|floatformat }} * {{ item.book.price|floatformat:2 }} = {{ item.quantity|mul:item.book.price|floatformat:2 }}</td>
+          <td>${{ item.quantity|mul:item.book.price|floatformat:2 }}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -60,8 +62,13 @@
     <form method="post" style="margin-top: 16px;" action="{% url 'checkout' %}">
       {% csrf_token %}
       <button type="submit" style="padding: 12px 24px; font-weight: 700; font-size: 1rem; border: none; border-radius: 8px; background: var(--primary); color: white;">Confirm Purchase</button>
-      <a href="{% url 'cart' %}" style="padding: 12px 24px; margin-left: 10px; font-weight: 700; border-radius: 8px; background: var(--text-secondary); color: white; text-decoration: none;">Cancel</a>
     </form>
+
+    <form method="post" style="display: inline; margin-left: 10px;" action="{% url 'cancel_checkout' %}">
+      {% csrf_token %}
+      <button type="submit" style="padding: 12px 24px; font-weight: 700; border-radius: 8px; background: var(--text-secondary); color: white; border: none; cursor: pointer;">Cancel</button>
+    </form>
+
   {% else %}
   <p style="font-style: italic; color: var(--text-secondary); font-size: 1.1rem;">Your cart is empty.</p>
   {% endif %}
