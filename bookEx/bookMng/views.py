@@ -10,7 +10,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from .models import ShoppingCart
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg
+from django.db.models import Avg, Q
 from django.db.models import Sum
 from django.contrib import messages
 from .models import BookReturn
@@ -124,10 +124,60 @@ class Register(CreateView):
 def aboutus(request):
    return render(request, 'aboutus.html', { 'item_list': MainMenu.objects.all() })
 
+
 def searchbooks(request):
     query = request.GET.get('q')
-    books = Book.objects.filter(name__icontains=query) if query else []
-    return render(request, 'searchbooks.html', { 'books': books, 'item_list': MainMenu.objects.all(), 'query': query })
+    min_rating = request.GET.get('min_rating')
+    price_min = request.GET.get('price_min')
+    price_max = request.GET.get('price_max')
+
+    books = Book.objects.all()
+    if query:
+        books = books.filter(name__icontains=query)
+
+    books = books.annotate(avg_rating_value=Avg('rate__rating'))
+
+    # Filter by rating only if min_rating is set and not 'none'
+    if min_rating and min_rating != 'none':
+        try:
+            min_rating_float = float(min_rating)
+            books = books.filter(avg_rating_value__gte=min_rating_float)
+        except ValueError:
+            pass
+
+    if price_min:
+        try:
+            price_min_val = float(price_min)
+            books = books.filter(price__gte=price_min_val)
+        except ValueError:
+            pass
+
+    if price_max:
+        try:
+            price_max_val = float(price_max)
+            books = books.filter(price__lte=price_max_val)
+        except ValueError:
+            pass
+
+    books = books.prefetch_related('comments')
+
+    # For static pic_path extraction and rating None handling
+    for book in books:
+        if book.picture:
+            book.pic_path = book.picture.url.split('/static/')[-1]
+        else:
+            book.pic_path = 'default.jpg'  # fallback image path if needed
+        if book.avg_rating_value is None:
+            book.avg_rating_value = None
+
+    context = {
+        'books': books,
+        'query': query or '',
+        'min_rating': min_rating or 'none',
+        'price_min': price_min or '',
+        'price_max': price_max or '',
+    }
+    return render(request, 'bookMng/searchbooks.html', context)
 
 @login_required
 def add_to_cart(request, book_id):
