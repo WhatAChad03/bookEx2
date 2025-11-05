@@ -405,3 +405,10 @@ def cancel_checkout(request):
         # Remove all shopping cart items for the current user that are not checked out
         ShoppingCart.objects.filter(user=request.user, checked_out=False).delete()
     return redirect('cart')  # Ensure 'cart' URL name exists
+
+@login_required
+def delete_rating(request, rate_id):
+    rating = get_object_or_404(Rate, id=rate_id)
+    if rating.user == request.user:
+        rating.delete()
+    return redirect('book_detail', book_id=rating.book.id)

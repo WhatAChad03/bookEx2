@@ -62,14 +62,14 @@
             <span>
               {% for i in "12345" %}
                 {% if avg_rating|floatformat:1 >= i %}
-                  <span style="color:#FFD700; font-size:1.5rem;">&#9733;</span>
+                  <span style="color:#FFD700; font-size:1.5rem;">★</span>
                 {% elif avg_rating|floatformat:1 > i|add:"-1" %}
                   <span style="position: relative; font-size:1.5rem;">
-                    <span style="color:#FFD700; position:absolute; overflow:hidden; width:50%;">&#9733;</span>
-                    <span style="color:#ccc;">&#9733;</span>
+                    <span style="color:#FFD700; position:absolute; overflow:hidden; width:50%;">★</span>
+                    <span style="color:#ccc;">★</span>
                   </span>
                 {% else %}
-                  <span style="color:#ccc; font-size:1.5rem;">&#9733;</span>
+                  <span style="color:#ccc; font-size:1.5rem;">★</span>
                 {% endif %}
               {% endfor %}
             </span>
@@ -81,17 +81,25 @@
 
         <ul style="list-style:none; padding-left:0;">
           {% for rate in ratings %}
-          <li style="margin-bottom: 8px; padding: 8px; background: var(--bg-secondary); border-radius: 6px;">
-            <strong>{% if rate.user == user %}You{% else %}Anonymous{% endif %}</strong> :
-            <span>
-              {% for i in "12345" %}
-                {% if i|add:"0" <= rate.rating %}
-                  <span style="color:#FFD700; font-size:1.3rem;">&#9733;</span>
-                {% else %}
-                  <span style="color:#ccc; font-size:1.3rem;">&#9733;</span>
-                {% endif %}
-              {% endfor %}
-            </span>
+          <li style="margin-bottom: 8px; padding: 8px; background: var(--bg-secondary); border-radius: 6px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <strong>{% if rate.user == user %}You{% else %}Anonymous{% endif %}</strong> :
+              <span>
+                {% for i in "12345" %}
+                  {% if i|add:"0" <= rate.rating %}
+                    <span style="color:#FFD700; font-size:1.3rem;">★</span>
+                  {% else %}
+                    <span style="color:#ccc; font-size:1.3rem;">★</span>
+                  {% endif %}
+                {% endfor %}
+              </span>
+            </div>
+            {% if rate.user == user %}
+            <form method="post" action="{% url 'delete_rating' rate.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" style="background: #dc3545; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer;">Delete</button>
+            </form>
+            {% endif %}
           </li>
           {% endfor %}
         </ul>
