@@ -2,85 +2,106 @@
 {% load static %}
 
 {% block content %}
-<h1 style="color: var(--primary); margin-bottom: 1.5rem;">Search Books</h1>
+<section style="max-width: 700px; margin: 2rem auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
 
-<form method="get" style="max-width: 600px; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-  <input
-    type="text"
-    name="q"
-    placeholder="Enter book name"
-    value="{{ query }}"
-    style="flex: 2 1 250px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px;"
-  />
-  <select name="min_rating" style="flex: 1 1 120px; padding: 8px; border-radius: 8px; border: 1px solid var(--border);">
-    <option value="none" {% if min_rating == 'none' %}selected{% endif %}>Any rating</option>
-    {% for i in "12345" %}
-      <option value="{{ i }}" {% if min_rating == i %}selected{% endif %}>{{ i }} star{% if i != '1' %}s{% endif %}+</option>
-    {% endfor %}
-  </select>
-  <input
-    type="number"
-    name="price_min"
-    min="0"
-    step="0.01"
-    placeholder="Min price"
-    value="{{ price_min }}"
-    style="flex: 1 1 80px; padding: 8px; border-radius: 8px; border: 1px solid var(--border);"
-  />
-  <input
-    type="number"
-    name="price_max"
-    min="0"
-    step="0.01"
-    placeholder="Max price"
-    value="{{ price_max }}"
-    style="flex: 1 1 80px; padding: 8px; border-radius: 8px; border: 1px solid var(--border);"
-  />
-  <button type="submit" class="btn btn-primary" style="flex: 1 1 100px; border-radius: 8px; padding: 8px;">
-    Search
-  </button>
-</form>
+  <h1 style="color: var(--primary); margin-bottom: 2rem; font-weight: 800; font-size: 2.8rem; text-align: center; letter-spacing: 1.5px; text-transform: uppercase; text-shadow: 1px 1px 3px rgba(0,0,0,0.1);">
+    Search Books
+  </h1>
 
-{% if books %}
-  <ul style="list-style: none; padding-left: 0; max-width: 600px;">
-    {% for book in books %}
-      <li style="display: flex; gap: 12px; padding: 12px 0; align-items: center; border-bottom: 1px solid var(--border);">
-        <img src="{% static book.pic_path %}" alt="{{ book.name }} Cover" style="width: 80px; height: 120px; object-fit: cover; border-radius: 8px;">
-        <div style="flex-grow: 1;">
-          <a href="{% url 'book_detail' book.id %}" style="font-weight: 700; font-size: 1.2rem; color: var(--primary); text-decoration: none;">
-            {{ book.name }}
-          </a>
-          <p style="margin: 4px 0; font-weight: 600; color: var(--text-secondary);">${{ book.price }}</p>
+  <form method="get" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 2rem;">
+    <input
+      type="text"
+      name="q"
+      placeholder="Enter book name"
+      value="{{ query }}"
+      style="flex: 2 1 250px; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 1rem; transition: box-shadow 0.3s; outline: none;"
+      onfocus="this.style.boxShadow='0 0 8px var(--primary)';"
+      onblur="this.style.boxShadow='none';"
+    />
+    <select name="min_rating" style="flex: 1 1 120px; padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 1rem;">
+      <option value="none" {% if min_rating == 'none' %}selected{% endif %}>Any rating</option>
+      {% for i in "12345" %}
+        <option value="{{ i }}" {% if min_rating == i %}selected{% endif %}>{{ i }} star{% if i != '1' %}s{% endif %}+</option>
+      {% endfor %}
+    </select>
+    <input
+      type="number"
+      name="price_min"
+      min="0"
+      step="0.01"
+      placeholder="Min price"
+      value="{{ price_min }}"
+      style="flex: 1 1 80px; padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 1rem;"
+    />
+    <input
+      type="number"
+      name="price_max"
+      min="0"
+      step="0.01"
+      placeholder="Max price"
+      value="{{ price_max }}"
+      style="flex: 1 1 80px; padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 1rem;"
+    />
+    <button type="submit" class="btn btn-primary" style="
+      flex: 1 1 100px;
+      border-radius: 10px;
+      padding: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      background-color: var(--primary);
+      border: none;
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(0, 123, 255, 0.5);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    " onmouseover="this.style.backgroundColor='var(--primary-dark)'; this.style.boxShadow='0 8px 20px rgba(0, 100, 210, 0.7)';"
+    onmouseout="this.style.backgroundColor='var(--primary)'; this.style.boxShadow='0 6px 16px rgba(0, 123, 255, 0.5)';">
+      Search
+    </button>
+  </form>
 
-          {% if book.avg_rating_value %}
-            {% with rating_string=book.avg_rating_value|stringformat:"s" %}
-              {% with rating_main=rating_string|slice:":1" %}
-                <div style="font-size: 1.3rem; color: #FFD700; line-height: 1; user-select:none;">
-                  {% for star_num in "12345" %}
-                    {% if star_num <= rating_main %}
-                      &#9733;
-                    {% else %}
-                      <span style="color: #ccc;">&#9733;</span>
-                    {% endif %}
-                  {% endfor %}
-                  <span style="font-size: 0.85rem; color: var(--text-secondary); margin-left: 8px;">
-                    ({{ book.avg_rating_value|floatformat:1 }}/5)
-                  </span>
-                </div>
+  {% if books %}
+    <ul style="list-style: none; padding-left: 0;">
+      {% for book in books %}
+        <li style="display: flex; gap: 16px; padding: 16px 0; align-items: center; border-bottom: 1px solid var(--border);">
+          <img src="{% static book.pic_path %}" alt="{{ book.name }} Cover" style="width: 90px; height: 135px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+          <div style="flex-grow: 1;">
+            <a href="{% url 'book_detail' book.id %}" style="font-weight: 700; font-size: 1.3rem; color: var(--primary); text-decoration: none; transition: color 0.3s;">
+              {{ book.name }}
+            </a>
+            <p style="margin: 6px 0 4px 0; font-weight: 600; color: var(--text-secondary); font-size: 1.05rem;">${{ book.price }}</p>
+
+            {% if book.avg_rating_value %}
+              {% with rating_string=book.avg_rating_value|stringformat:"s" %}
+                {% with rating_main=rating_string|slice:":1" %}
+                  <div style="font-size: 1.4rem; color: #FFD700; line-height: 1; user-select:none;">
+                    {% for star_num in "12345" %}
+                      {% if star_num <= rating_main %}
+                        &#9733;
+                      {% else %}
+                        <span style="color: #ccc;">&#9733;</span>
+                      {% endif %}
+                    {% endfor %}
+                    <span style="font-size: 0.9rem; color: var(--text-secondary); margin-left: 10px;">
+                      ({{ book.avg_rating_value|floatformat:1 }}/5)
+                    </span>
+                  </div>
+                {% endwith %}
               {% endwith %}
-            {% endwith %}
-          {% else %}
-            <div style="color: var(--text-secondary); font-style: italic;">No rating</div>
-          {% endif %}
+            {% else %}
+              <div style="color: var(--text-secondary); font-style: italic; font-size: 1rem;">No rating</div>
+            {% endif %}
 
-          <p style="margin-top: 6px; color: var(--text-primary); font-size: 0.9rem;">
-            {{ book.comments.all|length }} Comment{{ book.comments.all|length|pluralize }}
-          </p>
-        </div>
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p style="color: var(--text-secondary); max-width: 600px; font-style: italic;">No books found matching your criteria.</p>
-{% endif %}
+            <p style="margin-top: 8px; color: var(--text-primary); font-size: 1rem;">
+              {{ book.comments.all|length }} Comment{{ book.comments.all|length|pluralize }}
+            </p>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p style="color: var(--text-secondary); font-style: italic; font-size: 1.1rem; text-align: center;">No books found matching your criteria.</p>
+  {% endif %}
+</section>
+
 {% endblock %}
