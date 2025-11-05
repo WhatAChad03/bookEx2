@@ -2,31 +2,47 @@
 {% load static %}
 
 {% block sidenav %}
-   <li>
-       <a href="/">Home</a>
-   </li>
+   <li><a href="/" style="display: inline-block; padding: 8px 16px; background: var(--primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 600;">Home</a></li>
 {% endblock sidenav %}
 
 {% block content %}
-   <section style="max-width: 400px; margin: 3rem auto; padding: 2rem; background: var(--bg-secondary); border-radius: 12px; box-shadow: var(--shadow);">
-       <h1 style="margin-bottom: 1.5rem; color: var(--primary); font-weight: 700;">User Login</h1>
+<div style="max-width: 700px; margin: 3rem auto; display: flex; align-items: center; gap: 2rem; background: var(--bg-secondary); padding: 2rem; border-radius: 12px; box-shadow: var(--shadow); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
 
-       <form action="{% url 'login' %}" method="post" novalidate>
-           {% csrf_token %}
-           <table style="width: 100%; border-spacing: 0 1rem;">
-               {{ form.as_table }}
-               <tr>
-                   <td colspan="2" style="text-align: center; padding-top: 0.5rem;">
-                       <input type="submit" value="Login"
-                              style="background: var(--primary); color: white; padding: 10px 25px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: background 0.3s;">
-                   </td>
-               </tr>
-           </table>
-           <p style="margin-top: 1rem; font-size: 0.9rem;">
-               To register <a href="{% url 'register' %}" style="color: var(--primary); text-decoration: underline;">click here</a>.
-           </p>
+  <!-- Left Image -->
+  <div style="flex: 1 1 40%; display: flex; justify-content: center;">
+    <img src="https://cdn.mos.cms.futurecdn.net/v2/t:0,l:122,cw:726,ch:545,q:80,w:726/pk2A58d5MnYCSGKAi2mGVS.jpg" alt="Login Illustration" style="max-width: 100%; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+  </div>
 
-           <input type="hidden" name="next" value="{{ next }}" />
-       </form>
-   </section>
+  <!-- Right Login Form -->
+  <section style="flex: 1 1 60%;">
+    <h1 style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; color: var(--primary); font-weight: 700; font-size: 2.2rem;">
+      <i class="fas fa-user-circle" style="font-size: 2.6rem;"></i>
+      User Login
+    </h1>
+
+    <form action="{% url 'login' %}" method="post" novalidate>
+      {% csrf_token %}
+      <table style="width: 100%; border-spacing: 0 1rem;">
+        {{ form.as_table }}
+        <tr>
+          <td colspan="2" style="text-align: center; padding-top: 0.5rem;">
+            <input type="submit" value="Login"
+                   style="background: var(--primary); color: white; padding: 12px 30px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; font-size: 1.2rem; transition: background 0.3s ease;">
+          </td>
+        </tr>
+      </table>
+    </form>
+
+    <hr style="margin: 2rem 0; border: none; border-top: 2px solid var(--border);">
+
+    <div style="display: flex; justify-content: center; align-items: center; gap: 16px;">
+      <a href="{% url 'register' %}" style="padding: 12px 30px; background: var(--primary); color: white; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 1.1rem; cursor: pointer; transition: background 0.3s ease;">
+        Register
+      </a>
+      <span style="color: var(--text-secondary); font-size: 1rem;">
+        Don't have an account? Register today!
+      </span>
+    </div>
+  </section>
+</div>
 {% endblock content %}

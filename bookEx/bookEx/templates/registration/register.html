@@ -1,32 +1,53 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
-<section style="max-width:400px; margin:3rem auto; background: var(--bg-secondary); padding: 2rem; border-radius: 12px; box-shadow: var(--shadow);">
-  <h1>User Registration</h1>
-  <form method="post" novalidate>
-    {% csrf_token %}
-    {{ form.non_field_errors }}
+<div style="max-width: 800px; margin: 3rem auto; display: flex; align-items: center; gap: 2.5rem; background: var(--bg-secondary); padding: 2rem; border-radius: 12px; box-shadow: var(--shadow); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
 
-    <div style="margin-bottom: 1rem;">
-      <label for="{{ form.username.id_for_label }}">Username</label><br/>
-      {{ form.username }}
-      {% for error in form.username.errors %}<div style="color:red">{{ error }}</div>{% endfor %}
-    </div>
+  <!-- Left Image -->
+  <div style="flex: 1 1 45%; display: flex; justify-content: center;">
+    <img src="https://static.vecteezy.com/system/resources/previews/048/965/792/non_2x/website-registration-concept-create-account-login-illustration-vector.jpg" alt="Registration Illustration" style="max-width: 100%; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
+  </div>
 
-    <div style="margin-bottom: 1rem;">
-      <label for="{{ form.password1.id_for_label }}">Password</label><br/>
-      {{ form.password1 }}
-      {% for error in form.password1.errors %}<div style="color:red">{{ error }}</div>{% endfor %}
-    </div>
+  <!-- Right Registration Form -->
+  <section style="flex: 1 1 55%;">
+    <h1 style="display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; color: var(--primary); font-weight: 700; font-size: 2.4rem;">
+      <i class="fas fa-user-plus" style="font-size: 2.8rem;"></i>
+      User Registration
+    </h1>
 
-    <div style="margin-bottom: 1.5rem;">
-      <label for="{{ form.password2.id_for_label }}">Confirm Password</label><br/>
-      {{ form.password2 }}
-      {% for error in form.password2.errors %}<div style="color:red">{{ error }}</div>{% endfor %}
-    </div>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
 
-    <div style="text-align: center; margin-top: 1.5rem;">
-      <input type="submit" value="Submit" style="background: var(--primary); color: white; padding: 10px 28px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; font-size: 1.1rem; transition: background 0.3s ease;" />
-    </div>
-  </form>
-</section>
+      <div style="margin-bottom: 1.25rem;">
+        <label for="{{ form.username.id_for_label }}" style="font-weight: 600; color: var(--text-primary); margin-bottom: 6px; display: block;">Username</label>
+        {{ form.username }}
+        {% for error in form.username.errors %}
+          <div style="color: #e53e3e; margin-top: 4px;">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <label for="{{ form.password1.id_for_label }}" style="font-weight: 600; color: var(--text-primary); margin-bottom: 6px; display: block;">Password</label>
+        {{ form.password1 }}
+        {% for error in form.password1.errors %}
+          <div style="color: #e53e3e; margin-top: 4px;">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label for="{{ form.password2.id_for_label }}" style="font-weight: 600; color: var(--text-primary); margin-bottom: 6px; display: block;">Confirm Password</label>
+        {{ form.password2 }}
+        {% for error in form.password2.errors %}
+          <div style="color: #e53e3e; margin-top: 4px;">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div style="text-align: center; margin-top: 1.5rem;">
+        <input type="submit" value="Submit" style="background: var(--primary); color: white; padding: 14px 36px; font-weight: 700; border-radius: 12px; border: none; cursor: pointer; font-size: 1.2rem; transition: background-color 0.3s ease;">
+      </div>
+    </form>
+  </section>
+</div>
 {% endblock %}
