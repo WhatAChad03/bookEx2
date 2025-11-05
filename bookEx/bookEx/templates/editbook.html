@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container" style="max-width: 700px; margin-top: 40px; padding: 20px; background: var(--bg-secondary); border-radius: 12px; box-shadow: var(--shadow);">
+  <h1 style="font-weight: 700; color: var(--primary); margin-bottom: 1.5rem;">Edit Book</h1>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div style="margin-bottom: 1rem;">
+      <label for="id_name" style="font-weight: 600;">Book Title</label><br>
+      {{ form.name.errors }}
+      {{ form.name }}
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+      <label for="id_price" style="font-weight: 600;">Price</label><br>
+      {{ form.price.errors }}
+      {{ form.price }}
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+      <label for="id_picture" style="font-weight: 600;">Cover Image</label><br>
+      {{ form.picture.errors }}
+      {{ form.picture }}
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+      <label for="id_publishdate" style="font-weight: 600;">Publish Date</label><br>
+      {{ form.publishdate.errors }}
+      {{ form.publishdate }}
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+      <label for="id_web" style="font-weight: 600;">Website URL</label><br>
+      {{ form.web.errors }}
+      {{ form.web }}
+    </div>
+
+    <!-- Add any other fields similarly -->
+
+    <button type="submit" style="padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">
+      Save Changes
+    </button>
+    <a href="{% url 'book_detail' form.instance.id %}" style="margin-left: 12px; text-decoration: none; font-weight: 600; color: var(--primary);">
+      Cancel
+    </a>
+  </form>
+</div>
+{% endblock %}

@@ -37,6 +37,13 @@
       </form>
       {% endif %}
 
+      {% comment %} Show Edit link only if logged-in user is author of the book {% endcomment %}
+      {% if user == book.username %}
+        <a href="{% url 'edit_book' book.id %}" class="btn btn-outline-primary" style="margin-top: 20px; padding: 8px 16px;">
+          Edit Book
+        </a>
+      {% endif %}
+
       <div style="margin-top: 20px; display:flex; flex-wrap:wrap; gap: 8px;">
         <form action="{% url 'rate_book' book.id %}" method="get" style="display:inline;">
           <button type="submit" class="btn btn-warning" style="padding: 12px 22px; font-weight: 700;">Rate this Book</button>

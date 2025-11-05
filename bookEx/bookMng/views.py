@@ -381,7 +381,8 @@ def return_book(request, book_id):
 
 @group_required('Publisher', 'Writer')
 def edit_book(request, book_id):
-    book = get_object_or_404(Book, id=book_id, author=request.user)
+    # Filter by username (the user who posted the book)
+    book = get_object_or_404(Book, id=book_id, username=request.user)
     if request.method == 'POST':
         form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
