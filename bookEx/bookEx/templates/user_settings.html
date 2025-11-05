@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<section style="max-width: 400px; margin: 3rem auto; background: var(--bg-secondary); padding: 2rem; border-radius: 12px; box-shadow: var(--shadow);">
+  <h1>Profile Settings</h1>
+  <form method="post">
+    {% csrf_token %}
+    <label for="id_role">Role:</label>
+    <select id="id_role" name="role" style="padding: 8px; border-radius: 8px; margin-top: 6px; width: 100%;">
+      <option value="Regular" {% if profile.role == "Regular" %}selected{% endif %}>Regular User</option>
+      <option value="Publisher" {% if profile.role == "Publisher" %}selected{% endif %}>Publisher</option>
+      <option value="Writer" {% if profile.role == "Writer" %}selected{% endif %}>Writer</option>
+    </select>
+    <div style="margin-top: 20px;">
+      <button type="submit" style="width: 100%; padding: 12px; background: var(--primary); color: white; font-weight: 700; border-radius: 12px;">Update Profile</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

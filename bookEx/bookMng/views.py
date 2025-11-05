@@ -14,27 +14,40 @@ from django.db.models import Avg, Q
 from django.db.models import Sum
 from django.contrib import messages
 from .models import BookReturn
+from .decorators import group_required
+from .forms import CustomUserCreationForm
+from .models import UserProfile
+from django.contrib.auth import login
+from django.contrib.auth.models import Group
 
 def index(request):
    return render(request, 'bookMng/index.html', { 'item_list': MainMenu.objects.all() })
 
+@login_required
 def postbook(request):
-   submitted = False
-   if request.method == 'POST':
-       form = BookForm(request.POST, request.FILES)
-       if form.is_valid():
-           book = form.save(commit=False)
-           try:
-               book.username = request.user
-           except Exception:
-               pass
-           book.save()
-           return HttpResponseRedirect('/postbook?submitted=True')
-   else:
-       form = BookForm()
-       if 'submitted' in request.GET:
-           submitted = True
-   return render(request, 'bookMng/postbook.html', { 'form': form, 'item_list': MainMenu.objects.all(), 'submitted': submitted })
+    # Check if user belongs to Publisher or Writer group
+    if not request.user.groups.filter(name__in=['Publisher', 'Writer']).exists():
+        return render(request, 'permission_denied.html', status=403)
+
+    submitted = False
+    if request.method == 'POST':
+        form = BookForm(request.POST, request.FILES)
+        if form.is_valid():
+            book = form.save(commit=False)
+            book.username = request.user
+            book.save()
+            submitted = True
+            return redirect('/postbook?submitted=True')
+    else:
+        form = BookForm()
+        if 'submitted' in request.GET:
+            submitted = True
+
+    return render(request, 'bookMng/postbook.html', {
+        'form': form,
+        'item_list': MainMenu.objects.all(),
+        'submitted': submitted
+    })
 
 def displaybooks(request):
     books = Book.objects.all()
@@ -111,14 +124,56 @@ class Register(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('register-success')
 
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
 
-    def form_invalid(self, form):
-        # Re-render the form with errors
-        return self.render_to_response(self.get_context_data(form=form))
+def register(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            is_publisher = form.cleaned_data.get('is_publisher')
+            is_writer = form.cleaned_data.get('is_writer')
 
+            # Assign groups based on checkboxes
+            if is_publisher:
+                publisher_group, _ = Group.objects.get_or_create(name='Publisher')
+                user.groups.add(publisher_group)
+            if is_writer:
+                writer_group, _ = Group.objects.get_or_create(name='Writer')
+                user.groups.add(writer_group)
+
+            # Determine role string for profile
+            if is_publisher and is_writer:
+                role = 'Publisher/Writer'
+            elif is_publisher:
+                role = 'Publisher'
+            elif is_writer:
+                role = 'Writer'
+            else:
+                role = 'Regular'
+
+            UserProfile.objects.create(user=user, role=role)
+
+            return redirect('register-success')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'register.html', {'form': form})
+
+def register_success(request):
+    return render(request, 'registration/register_success.html')
+
+@login_required
+def user_settings(request):
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    if request.method == 'POST':
+        new_role = request.POST.get('role')
+        if new_role in ['Regular', 'Publisher', 'Writer']:
+            profile.role = new_role
+            profile.save()
+            messages.success(request, 'Profile updated successfully.')
+            return redirect('user_settings')
+        else:
+            messages.error(request, 'Invalid role selected.')
+    return render(request, 'user_settings.html', {'profile': profile})
 
 
 def aboutus(request):
@@ -310,3 +365,44 @@ def return_book(request, book_id):
         'book': book,
         'available_to_return': available_to_return,
     })
+
+@login_required
+def postbook(request):
+    profile = getattr(request.user, 'userprofile', None)
+    if not profile or profile.role not in ['Publisher', 'Writer']:
+        return render(request, 'permission_denied.html', status=403)
+
+    submitted = False
+    if request.method == 'POST':
+        form = BookForm(request.POST, request.FILES)
+        if form.is_valid():
+            book = form.save(commit=False)
+            book.username = request.user
+            book.save()
+            submitted = True
+    else:
+        form = BookForm()
+        if 'submitted' in request.GET:
+            submitted = True
+
+    return render(request, 'postbook.html', {'form': form, 'submitted': submitted})
+
+@group_required('Publisher', 'Writer')
+def edit_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id, author=request.user)
+    if request.method == 'POST':
+        form = BookForm(request.POST, request.FILES, instance=book)
+        if form.is_valid():
+            form.save()
+            return redirect('book_detail', book_id=book.id)
+    else:
+        form = BookForm(instance=book)
+    return render(request, 'editbook.html', {'form': form})
+
+@group_required('Publisher', 'Writer')
+def delete_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id, author=request.user)
+    if request.method == 'POST':
+        book.delete()
+        return redirect('mybooks')
+    return render(request, 'delete_confirm.html', {'book': book})

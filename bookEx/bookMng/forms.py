@@ -1,6 +1,9 @@
 from django import forms
 from django.forms import ModelForm
 from .models import Book
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+
 
 class BookForm(ModelForm):
    class Meta:
@@ -11,3 +14,11 @@ class BookForm(ModelForm):
            'price',
            'picture',
        ]
+
+class CustomUserCreationForm(UserCreationForm):
+    is_publisher = forms.BooleanField(required=False, label='Register as Publisher')
+    is_writer = forms.BooleanField(required=False, label='Register as Writer')
+
+    class Meta:
+        model = User
+        fields = ('username', 'password1', 'password2', 'is_publisher', 'is_writer')

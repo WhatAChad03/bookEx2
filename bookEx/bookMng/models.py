@@ -59,3 +59,15 @@ class BookReturn(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     returned_at = models.DateTimeField(auto_now_add=True)
+
+class UserProfile(models.Model):
+    ROLE_CHOICES = [
+        ('Regular', 'Regular User'),
+        ('Publisher', 'Publisher'),
+        ('Writer', 'Writer'),
+    ]
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='Regular')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.role}"
