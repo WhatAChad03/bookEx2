@@ -413,3 +413,19 @@ def delete_rating(request, rate_id):
     if rating.user == request.user:
         rating.delete()
     return redirect('book_detail', book_id=rating.book.id)
+
+@login_required
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    if comment.user != request.user:
+        return HttpResponseForbidden("You cannot edit this comment.")
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content:
+            comment.content = content
+            comment.save()
+        return redirect('book_detail', book_id=comment.book.id)
+
+    # Optionally handle GET if you want a separate edit page
+    return redirect('book_detail', book_id=comment.book.id)
